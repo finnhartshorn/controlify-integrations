@@ -3,6 +3,9 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
         maven("https://maven.fabricmc.net/")
+        maven("https://maven.architectury.dev")
+        maven("https://maven.neoforged.net/releases/")
+        maven("https://maven.minecraftforge.net/")
     }
 }
 
@@ -20,4 +23,4 @@ stonecutter {
     create(rootProject)
 }
 
-rootProject.name = "Template"
+rootProject.name = "ControlifyIntegrations"

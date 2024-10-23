@@ -16,16 +16,16 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.example.TemplateMod"
+      "com.finnethen.controlifyintegrations.ControlifyIntegrations"
     ],
     "client": [
-      "com.example.TemplateModClient"
+      "com.finnethen.controlifyintegrations.ControlifyIntegrationsClient"
     ]
   },
   "mixins": [
-    "template.mixins.json",
+    "controlifyintegrations.mixins.json",
     {
-      "config": "template.client.mixins.json",
+      "config": "controlifyintegrations.client.mixins.json",
       "environment": "client"
     }
   ],

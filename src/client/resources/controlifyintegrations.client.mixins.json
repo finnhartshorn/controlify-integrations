@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"package": "com.finnethen.controlifyintegrations.mixin.client",
+	"compatibilityLevel": "JAVA_17",
+	"client": [
+      "ExampleClientMixin",
+	  "MixinVirtualMouseHandler"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

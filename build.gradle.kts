@@ -1,6 +1,7 @@
 plugins {
     `maven-publish`
-    id("fabric-loom")
+//    id("fabric-loom")
+    id("dev.architectury.loom")
     //id("dev.kikugie.j52j")
     //id("me.modmuss50.mod-publish-plugin")
 }
@@ -43,6 +44,9 @@ repositories {
     }
     strictMaven("https://www.cursemaven.com", "CurseForge", "curse.maven")
     strictMaven("https://api.modrinth.com/maven", "Modrinth", "maven.modrinth")
+    maven("https://maven.isxander.dev/releases")
+    maven("https://maven.isxander.dev/snapshots")
+    maven("https://maven.terraformersmc.com")
 }
 
 dependencies {
@@ -54,6 +58,20 @@ dependencies {
     mappings("net.fabricmc:yarn:$mcVersion+build.${deps["yarn_build"]}:v2")
     modImplementation("net.fabricmc:fabric-loader:${deps["fabric_loader"]}")
 
+    "modApi"("dev.isxander:yet-another-config-lib:${property("deps.yacl")}") {
+        exclude("maven.modrinth")
+        exclude(module = "reeses-sodium-options")
+    }
+    "modApi"("dev.isxander:controlify:${property("deps.controlify")}") {
+        exclude("maven.modrinth")
+        exclude(module = "reeses-sodium-options")
+    }
+    "modApi"("dev.emi:emi-${property("loom.platform")}:${property("deps.emi")}")
+//        exclude("maven.modrinth")
+//        exclude(module = "reeses-sodium-options")
+//    }
+//    implementation fg.deobf("dev.emi:emi-forge:${emi_version}:api")
+//    compileOnly fg.deobf("dev.emi:emi-forge:${emi_version}")
     fapi(
         // Add modules from https://github.com/FabricMC/fabric
         "fabric-lifecycle-events-v1",
