@@ -20,6 +20,9 @@
     ],
     "client": [
       "com.finnethen.controlifyintegrations.ControlifyIntegrationsClient"
+    ],
+    "controlify": [
+      "com.finnethen.controlifyintegrations.ControlifySupport"
     ]
   },
   "mixins": [
