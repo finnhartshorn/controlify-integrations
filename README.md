@@ -1,9 +1,15 @@
-# multiloader-multiversion-template
+# Controlify Integrations
 
-A multiversion, multiloader template powered by Archloom and Stonecutter. Made for Fabric & NeoForge.
+Adds mod integrations for controlify
 
-This template is made primarily suited for my own needs, but should be very simple to edit what you need!
 
-In terms of buildscript, most of what needs to be changed is in gradle.properties and the root project name in settings.gradle.kts
 
-Don't forget to change the license, some information in the FMJ, and the author field in neoforge.mods.toml!
+
+### Supported Loaders and Future Plans
+
+Key: f = fabric, n = neoforge, g = forge
+Those in bold are currently supported, those in italics are planned
+
+|  | 1.20.1 | 1.20.4 | 1.20.6 | 1.21.1 | 1.21.2 |
+| --- | --- | --- | --- | --- | --- |
+| EMI | **f** g | **f** _n_ | **f** _n_ | **f** _n_ | _f n_ |

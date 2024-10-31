@@ -21,6 +21,9 @@ class Dependencies {
 	val modmenuVersion = property("deps.modmenu_version")
 	val yaclVersion = property("deps.yacl_version")
 	val devauthVersion = property("deps.devauth_version")
+	val controlifyVersion = property("deps.controlify_version")
+	val emiVersion = property("deps.emi_version")
+	val yarnBuild = property("deps.yarn_build")
 }
 
 class LoaderData {
@@ -59,6 +62,12 @@ loom {
 }
 
 repositories {
+	fun strictMaven(url: String, alias: String, vararg groups: String) = exclusiveContent {
+		forRepository { maven(url) { name = alias } }
+		filter { groups.forEach(::includeGroup) }
+	}
+	strictMaven("https://www.cursemaven.com", "CurseForge", "curse.maven")
+	strictMaven("https://api.modrinth.com/maven", "Modrinth", "maven.modrinth")
 	maven("https://maven.parchmentmc.org") // Parchment
 	maven("https://maven.isxander.dev/releases") // YACL
 	maven("https://thedarkcolour.github.io/KotlinForForge") // Kotlin for Forge - required by YACL
@@ -70,17 +79,22 @@ repositories {
 dependencies {
 	minecraft("com.mojang:minecraft:${mc.version}")
 
-	@Suppress("UnstableApiUsage")
-	mappings(loom.layered {
-		// Mojmap mappings
-		officialMojangMappings()
-
-		// Parchment mappings (it adds parameter mappings & javadoc)
-		optionalProp("deps.parchment_version") {
-			if (mc.version == "1.21.3") parchment("org.parchmentmc.data:parchment-1.21:$it@zip") // TODO: remove when parchment 1.21.3
-			else parchment("org.parchmentmc.data:parchment-${property("mod.mc_version")}:$it@zip")
-		}
-	})
+	var mcShortVersion = mc.version
+	if (mc.version == "1.21.1") {
+		mcShortVersion = "1.21"
+	}
+	if (loader.isFabric) {
+		mappings("net.fabricmc:yarn:${mc.version}+build.${deps.yarnBuild}:v2")
+	} else if (loader.isNeoforge) {
+		@Suppress("UnstableApiUsage")
+		mappings(loom.layered {
+			mappings("net.fabricmc:yarn:${mc.version}+build.${deps.yarnBuild}:v2")
+			if (mc.version == "1.21.1" || mc.version == "1.21.3") {
+				mappings("dev.architectury:yarn-mappings-patch-neoforge:1.21+build.4")
+			}
+//			mappings("net.fabricmc:yarn:${mc.version}+build.${deps.yarnBuild}:v2")
+		})
+	}
 
 	modRuntimeOnly("me.djtheredstoner:DevAuth-${loader.loader}:${deps.devauthVersion}")
 
@@ -88,12 +102,20 @@ dependencies {
 		modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
 		if (mc.version == "1.21.3") modImplementation("net.fabricmc.fabric-api:fabric-api:0.106.1+1.21.3") // TODO: remove when I know why this is needed lol
 		if (mc.version == "1.21.3") modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}") // TODO: remove when YACL 1.21.3
-		else modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}")
+		else modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mcShortVersion}-${loader.loader}")
 		modImplementation("com.terraformersmc:modmenu:${deps.modmenuVersion}")
 	} else if (loader.isNeoforge) {
 		"neoForge"("net.neoforged:neoforge:${findProperty("deps.neoforge")}")
 		if (mc.version == "1.21.3") implementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}") {isTransitive = false} // TODO: remove when YACL 1.21.3
 		else implementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}") {isTransitive = false}
+	}
+
+	modApi("dev.isxander:controlify:${deps.controlifyVersion}+${mcShortVersion}-${loader.loader}") {
+		exclude("maven.modrinth")
+		exclude(module = "reeses-sodium-options")
+	}
+	if (mc.version != "1.21.3") {
+		modApi("dev.emi:emi-${loader.loader}:${deps.emiVersion}+${mc.version}")
 	}
 }
 

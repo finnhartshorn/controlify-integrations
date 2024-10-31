@@ -5,7 +5,7 @@
 	"name": "${name}",
 	"description": "${description}",
 	"authors": [
-		"Microcontrollers"
+		"Finn"
 	],
 	"contributors": [
 	],
@@ -15,25 +15,29 @@
 		"issues": "${issues}"
 	},
 	"license": "${license}",
-	"icon": "assets/${id}/icon.png",
+	"icon": "assets/controlifyintegrations/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"dev.microcontrollers.examplemod.ExampleMod"
+			"com.finnethen.controlifyintegrations.ControlifyIntegrations"
 		],
 		"modmenu": [
-			"dev.microcontrollers.examplemod.config.ModMenuIntegration"
+			"com.finnethen.controlifyintegrations.config.ModMenuIntegration"
+		],
+		"controlify": [
+			"com.finnethen.controlifyintegrations.ControlifySupport"
 		]
 	},
 	"mixins": [
-		"${id}.mixins.json"
+		"controlifyintegrations.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.16.7",
+		"fabricloader": ">=0.16.5",
 		"minecraft": ">=1.20",
 		"java": ">=17",
 		"fabric-api": "*",
-		"yet_another_config_lib_v3": "*"
+		"yet_another_config_lib_v3": "*",
+		"controlify": "*"
 	},
 	"custom": {
 		"modmenu": {

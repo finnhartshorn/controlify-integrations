@@ -1,0 +1,22 @@
+{
+  "defaults": {
+    "controlifyintegrations:focus_left": {
+      "axis": "controlify:axis/left_trigger"
+    },
+    "controlifyintegrations:focus_right": {
+      "axis": "controlify:axis/right_trigger"
+    },
+    "controlifyintegrations:tab_left": {
+      "button": "controlify:button/left_shoulder"
+    },
+    "controlifyintegrations:tab_right": {
+      "button": "controlify:button/right_shoulder"
+    },
+    "controlifyintegrations:left_stick_click": {
+      "button": "controlify:button/left_stick"
+    },
+    "controlifyintegrations:right_stick_click": {
+      "button": "controlify:button/right_stick"
+    }
+  }
+}

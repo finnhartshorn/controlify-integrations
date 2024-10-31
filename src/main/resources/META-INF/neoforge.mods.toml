@@ -7,7 +7,7 @@ license = "${license}"
 modId = "${id}"
 version = "${version}"
 displayName = "${name}"
-authors = "Microcontrollers"
+authors = "Finn"
 description = "${description}"
 logoFile = "assets/${id}/icon.png"
 
