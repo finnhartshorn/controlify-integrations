@@ -36,8 +36,10 @@ side = "CLIENT"
 modId = "controlify"
 type = "required"
 versionRange = ""
-ordering = "AFTER"
+ordering = "BEFORE"
 side = "CLIENT"
+
+
 
 [[mixins]]
 config = "${id}.mixins.json"

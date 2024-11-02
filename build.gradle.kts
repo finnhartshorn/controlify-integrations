@@ -74,6 +74,7 @@ repositories {
 	maven("https://maven.terraformersmc.com") // Mod Menu
 	maven("https://maven.neoforged.net/releases") // NeoForge
 	maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
+	maven("https://maven.quiltmc.org/repository/release/") //Quilt
 }
 
 dependencies {
@@ -93,6 +94,10 @@ dependencies {
 				mappings("dev.architectury:yarn-mappings-patch-neoforge:1.21+build.4")
 			}
 //			mappings("net.fabricmc:yarn:${mc.version}+build.${deps.yarnBuild}:v2")
+//			optionalProp("deps.quiltMappings") {
+//				mappings("org.quiltmc:quilt-mappings:${mc.version}+build.${deps.quiltBuild}:intermediary-v2")
+//			}
+//			officialMojangMappings()
 		})
 	}
 
@@ -106,8 +111,11 @@ dependencies {
 		modImplementation("com.terraformersmc:modmenu:${deps.modmenuVersion}")
 	} else if (loader.isNeoforge) {
 		"neoForge"("net.neoforged:neoforge:${findProperty("deps.neoforge")}")
-		if (mc.version == "1.21.3") implementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}") {isTransitive = false} // TODO: remove when YACL 1.21.3
-		else implementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}") {isTransitive = false}
+		var yaclMcVersion = mc.version
+		if (mc.version == "1.21.1" || mc.version == "1.21.3") {
+			yaclMcVersion = "1.21.2"
+		}
+		modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${yaclMcVersion}-${loader.loader}") {isTransitive = false} // TODO: remove when YACL 1.21.3
 	}
 
 	modApi("dev.isxander:controlify:${deps.controlifyVersion}+${mcShortVersion}-${loader.loader}") {
@@ -158,7 +166,7 @@ tasks.processResources {
 
 	if (loader.isFabric) {
 		filesMatching("fabric.mod.json") { expand(props) }
-		exclude(listOf("META-INF/mods.toml", "META-INF/neoforge.mods.toml"))
+		exclude(listOf("META-INF/mods.toml", "META-INF/neoforge.mods.toml", "dev.isxander.controlify.api.entrypoint.ControlifyEntryPoint"))
 	}
 
 	if (loader.isNeoforge) {
