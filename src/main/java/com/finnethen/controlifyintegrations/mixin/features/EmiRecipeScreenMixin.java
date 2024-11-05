@@ -1,4 +1,4 @@
-package com.finnethen.controlifyintegrations.mixin;
+package com.finnethen.controlifyintegrations.mixin.features;
 
 import com.finnethen.controlifyintegrations.integrations.EmiRecipeScreenProcessor;
 import dev.emi.emi.EmiPort;

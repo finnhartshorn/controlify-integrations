@@ -1,4 +1,4 @@
-package com.finnethen.controlifyintegrations.mixin;
+package com.finnethen.controlifyintegrations.mixin.features;
 
 import dev.emi.emi.bom.MaterialNode;
 import net.minecraft.text.Text;

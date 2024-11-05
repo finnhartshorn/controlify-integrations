@@ -1,12 +1,14 @@
 package com.finnethen.controlifyintegrations.integrations;
 
 import com.finnethen.controlifyintegrations.ControlifyIntegrations;
-import com.finnethen.controlifyintegrations.mixin.ControlifyAccessor;
+import com.finnethen.controlifyintegrations.mixin.base.ControlifyAccessor;
 import com.finnethen.controlifyintegrations.mixin.VirtualMouseHandlerAccessor;
+import com.finnethen.controlifyintegrations.mixin.features.FTBLibraryScreenWrapperAccessor;
 import dev.emi.emi.config.SidebarSide;
 import dev.emi.emi.config.SidebarType;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.RecipeScreen;
+import dev.ftb.mods.ftblibrary.ui.ScreenWrapper;
 import dev.isxander.controlify.Controlify;
 import dev.isxander.controlify.api.vmousesnapping.SnapPoint;
 import dev.isxander.controlify.virtualmouse.VirtualMouseHandler;
@@ -221,9 +223,23 @@ public class EmiSupport {
         ControlifyIntegrations.LOGGER.info("#### Debug Stuff");
         if (MinecraftClient.getInstance().currentScreen != null) {
             ControlifyIntegrations.LOGGER.info("#### currentScreen: {} {}", MinecraftClient.getInstance().currentScreen, MinecraftClient.getInstance().currentScreen.getTitle());
+            if (MinecraftClient.getInstance().currentScreen instanceof ScreenWrapper) {
+                for (var widget: ((FTBLibraryScreenWrapperAccessor) MinecraftClient.getInstance().currentScreen).getWrappedGui().getWidgets()) {
+                    ControlifyIntegrations.LOGGER.info("#### widget: {} {} enabled: {} shouldDraw {}", widget, widget.isMouseOver(), widget.isEnabled(), widget.shouldDraw());
+                }
+            }
         }
         ControlifyIntegrations.LOGGER.info("#### virtualMouseEnabled: {}", ((VirtualMouseHandlerAccessor) getContolifyVirtualMouseHandler()).getVirtualMouseEnabled());
         ControlifyIntegrations.LOGGER.info("#### emiEnabled: {}", !EmiScreenManager.isDisabled());
         ControlifyIntegrations.LOGGER.info("#### focusArea: {}", getCurrentFocusArea());
+    }
+
+    public static void onRightStickPress() {
+//        if (MinecraftClient.getInstance().currentScreen instanceof ScreenWrapper) {
+//            for (var widget: ((FTBLibraryScreenWrapperAccessor) MinecraftClient.getInstance().currentScreen).getWrappedGui().getWidgets()) {
+////                ControlifyIntegrations.LOGGER.info("#### widget: {} {} enabled: {} shouldDraw {}", widget, widget.isMouseOver(), widget.isEnabled(), widget.shouldDraw());
+////                if (widget instanceof CustomTopPanel)
+//            }
+//        }
     }
 }

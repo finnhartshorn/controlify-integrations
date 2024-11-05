@@ -1,4 +1,4 @@
-package com.finnethen.controlifyintegrations.mixin;
+package com.finnethen.controlifyintegrations.mixin.base;
 
 import dev.isxander.controlify.Controlify;
 import dev.isxander.controlify.virtualmouse.VirtualMouseHandler;

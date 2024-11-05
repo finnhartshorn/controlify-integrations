@@ -3,16 +3,22 @@
 	"package": "com.finnethen.controlifyintegrations.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"ControlifyAccessor",
-		"EmiRecipeScreenMixin",
-		"EmiRecipeTreeScreenCostAccessor",
-		"EmiRecipeTreeScreenMixin",
-		"EmiRecipeTreeScreenNodeAccessor",
 		"ExampleClientMixin",
 		"MixinVirtualMouseHandler",
-		"VirtualMouseHandlerAccessor"
+		"VirtualMouseHandlerAccessor",
+		"base.ControlifyAccessor",
+		"features.EmiRecipeScreenMixin",
+		"features.EmiRecipeTreeScreenCostAccessor",
+		"features.EmiRecipeTreeScreenMixin",
+		"features.EmiRecipeTreeScreenNodeAccessor",
+		"features.FTBLibrarySidebarGroupGuiButtonAccessor",
+		"features.FTBQuestsChapterPanelWidgetAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1
-	}
+	},
+	"client": [
+		"features.FTBLibraryScreenWrapperAccessor",
+		"features.FTBLibraryScreenWrapperMixin"
+	]
 }

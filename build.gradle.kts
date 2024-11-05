@@ -75,6 +75,13 @@ repositories {
 	maven("https://maven.neoforged.net/releases") // NeoForge
 	maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
 	maven("https://maven.quiltmc.org/repository/release/") //Quilt
+	strictMaven("https://maven.saps.dev/releases", "ftb", "dev.latvian.mods", "dev.ftb.mods")
+//		url "https://maven.saps.dev/releases"
+//		content {
+//			includeGroup "dev.latvian.mods"
+//			includeGroup "dev.ftb.mods"
+//		}
+//	)
 }
 
 dependencies {
@@ -116,6 +123,12 @@ dependencies {
 			yaclMcVersion = "1.21.2"
 		}
 		modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${yaclMcVersion}-${loader.loader}") {isTransitive = false} // TODO: remove when YACL 1.21.3
+
+		if (mc.version == "1.20.4") {
+//			modApi("curse.maven:ftb-library-forge-404465:5816756")
+			modApi("curse.maven:ftb-library-forge-404465:5406275")
+			modApi("curse.maven:ftb-quests-forge-289412:5494845")
+		}
 	}
 
 	modApi("dev.isxander:controlify:${deps.controlifyVersion}+${mcShortVersion}-${loader.loader}") {
@@ -125,6 +138,21 @@ dependencies {
 	if (mc.version != "1.21.3") {
 		modApi("dev.emi:emi-${loader.loader}:${deps.emiVersion}+${mc.version}")
 	}
+
+	optionalProp("deps.architectury_api_version") {
+		modApi("dev.architectury:architectury-neoforge:${findProperty("deps.architectury_api_version")}")
+	}
+
+//	modApi("dev.ftb.mods:ftb-library:${findProperty("deps.ftb_library_version")}")
+//	modApi("dev.ftb.mods:ftb-library:${loader.loader}-${findProperty("deps.ftb_library_version")}")
+
+//	modImplementation("dev.ftb.mods:ftb-teams:${findProperty("deps.ftb_teams_version")}") { isTransitive = false }
+
+//	modImplementation("dev.ftb.mods:ftb-library:${rootProject.ftb_library_version}") { transitive = false }
+//	modImplementation("dev.ftb.mods:ftb-teams:${rootProject.ftb_teams_version}") { transitive = false }
+//	optionalProp("deps.ftb_libs_version") {
+//		modImplementation("")
+//	}
 }
 
 java {

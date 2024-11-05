@@ -1,6 +1,5 @@
-package com.finnethen.controlifyintegrations.mixin;
+package com.finnethen.controlifyintegrations.mixin.features;
 
-import com.finnethen.controlifyintegrations.ControlifyIntegrations;
 import com.finnethen.controlifyintegrations.integrations.EmiRecipeTreeScreenProcessor;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.widget.Bounds;

@@ -83,7 +83,7 @@ public class ControlifySupport implements ControlifyEntrypoint {
                 EmiSupport.debugStuff();
             }
             if (RIGHT_STICK_PRESS.on(controller.controller()).justPressed()) {
-//                EmiSupport.onRightStickPress();
+                EmiSupport.onRightStickPress();
             }
         });
 
