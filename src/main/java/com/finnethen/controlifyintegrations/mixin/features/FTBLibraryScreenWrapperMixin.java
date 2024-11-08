@@ -1,26 +1,27 @@
 package com.finnethen.controlifyintegrations.mixin.features;
 
-import com.finnethen.controlifyintegrations.ControlifyIntegrations;
 import com.finnethen.controlifyintegrations.integrations.FTBLibraryScreenWrapperProcessor;
 import dev.ftb.mods.ftblibrary.ui.*;
 import dev.ftb.mods.ftbquests.client.gui.quests.*;
 import dev.isxander.controlify.api.vmousesnapping.ISnapBehaviour;
 import dev.isxander.controlify.api.vmousesnapping.SnapPoint;
-import dev.isxander.controlify.screenop.ScreenProcessor;
-import dev.isxander.controlify.screenop.ScreenProcessorProvider;
+import dev.isxander.controlify.screenop.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableTextContent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Mixin(value = ScreenWrapper.class, remap = false)
-public abstract class FTBLibraryScreenWrapperMixin extends Screen implements ISnapBehaviour, ScreenProcessorProvider {
+public abstract class FTBLibraryScreenWrapperMixin extends Screen implements ISnapBehaviour, ScreenProcessorProvider /*,ScreenControllerEventListener*/ {
 
     @Final
     @Shadow
@@ -42,128 +43,91 @@ public abstract class FTBLibraryScreenWrapperMixin extends Screen implements ISn
     public Set<SnapPoint> getSnapPoints() {
         Set<SnapPoint> points = new HashSet<>();
 
-        wrappedGui.getWidgets().forEach(widget -> {
-            if (!widget.isEnabled() || !widget.shouldDraw()) {
-                return;
-            }
-            if (widget instanceof SimpleButton) {
-                points.add(new SnapPoint(widget.getX() + widget.width / 2, widget.getY() + widget.height / 2, Math.min(widget.width, widget.height) / 2));
-                return;
-            }
+        if (wrappedGui.anyModalPanelOpen()) {
+            FTBLibraryBaseScreenAccessor accessor = (FTBLibraryBaseScreenAccessor) wrappedGui;
+            accessor.getModalPanels().forEach(panel -> {
+                controlifyIntegrations$panelRecursive(points, panel);
+            });
+            return points;
+        }
 
-            switch (widget.getClass().getSimpleName()) {
-//                case "SimpleTooltipButton":
-//                case "SimpleButton":
-//                case "ClearDeathPointButton":
-//                case "SettingsButton":
-//                case "InviteButton":
-//                case "AllyButton":
-                case "ExpandChaptersButton":
-                    points.add(new SnapPoint(widget.getX() + widget.width / 2, widget.getY() + widget.height / 2, Math.min(widget.width, widget.height) / 2));
-//                    addWidgetSnapPoint(points, widget);
-                    break;
-                case "ChapterPanel":
-                    FTBQuestsChapterPanelWidgetAccessor chapterPanel = (FTBQuestsChapterPanelWidgetAccessor) widget;
-                    QuestScreen questScreen = chapterPanel.getQuestScreen();
-                    if (questScreen != null) {
-                        questScreen.getWidgets().forEach(subwidget -> {
-                            controlifyIntegrations$addWidgetSnapPoint(points, subwidget);
-                        });
-                        if (questScreen.questPanel != null) {
-                            questScreen.questPanel.getWidgets().forEach(subwidget -> {
-                                controlifyIntegrations$addWidgetSnapPoint(points, subwidget);
-                            });
-                        }
-                        if (questScreen.isViewingQuest()) {
-                            controlifyIntegrations$addViewQuestSnapPoints(points, questScreen.viewQuestPanel);
-//                            ControlifyIntegrations.LOGGER.info("Adding snap points for quest screen");
-//                            questScreen.viewQuestPanel.getWidgets().forEach(subwidget -> {
-//                                ControlifyIntegrations.LOGGER.info("Adding snap point for " + subwidget.getClass().getSimpleName());
-//                                addWidgetSnapPoint(points, subwidget);
-//                            });
-                        }
-                    }
-                    if (!chapterPanel.callIsPinned() || !chapterPanel.getExpanded() || !widget.isMouseOver()) {
-                        ControlifyIntegrations.LOGGER.info("Chapter panel is not pinned, expanded, or moused over");
-                        return;
-                    }
-                case "QuestPanel": // TODO: Test with a modpack with quests
-//                    QuestPanel questPanel = (QuestPanel) widget;
-//                    if questPanel.screen
-                case "OtherButtonsPanelBottom":
-                case "OtherButtonsPanelTop":
-                case "CustomTopPanel":
-                case "BottomPanel":
-                    Panel panel = (Panel) widget;
-                    panel.getWidgets().forEach(subwidget -> {
-                        controlifyIntegrations$addWidgetSnapPoint(points, subwidget);
-//                        points.add(new SnapPoint(subwidget.getX() + subwidget.width / 2, subwidget.getY() + subwidget.height / 2, Math.min(subwidget.width, subwidget.height) / 2));
-                    });
-                    break;
-                default:
-                    break;
-            }
+        wrappedGui.getWidgets().forEach(widget -> {
+            controlifyIntegrations$panelRecursive(points, widget);
         });
 
         return points;
     }
 
+
     @Unique
-    private void controlifyIntegrations$addWidgetSnapPoint(Set<SnapPoint> points, Widget widget) {
-        if (!widget.isEnabled() || !widget.shouldDraw()) {
-            return;
-        }
-        if (widget.getX() < 0
-                || widget.getY() < 0
-                || widget.getX() > MinecraftClient.getInstance().getWindow().getScaledWidth()
-                || widget.getY() > MinecraftClient.getInstance().getWindow().getScaledHeight()) {
-            return;
-        }
-        points.add(new SnapPoint(widget.getX() + widget.width / 2, widget.getY() + widget.height / 2, Math.min(widget.width, widget.height) / 2));
+    private boolean controlifyIntegrations$inBounds(int x, int y) {
+        return x >= 0 && y >= 0 && x <= MinecraftClient.getInstance().getWindow().getScaledWidth() && y <= MinecraftClient.getInstance().getWindow().getScaledHeight();
     }
 
     @Unique
-    private void controlifyIntegrations$addViewQuestSnapPoints(Set<SnapPoint> points, ViewQuestPanel viewQuestPanel) {
-        if (viewQuestPanel == null) {
+    private void controlifyIntegrations$panelRecursive(Set<SnapPoint> points, Widget widget) {
+        if (widget == null || !widget.isEnabled() || !widget.shouldDraw()) {
             return;
         }
-        viewQuestPanel.getWidgets().forEach(subwidget -> {
-            if (subwidget instanceof SimpleButton) {
-                points.add(new SnapPoint(subwidget.getX() + subwidget.width / 2, subwidget.getY() + subwidget.height / 2, Math.min(subwidget.width, subwidget.height) / 2));
-                return;
+
+        if (widget instanceof ChapterImageButton) {
+            return;
+        }
+
+        if (widget instanceof ExpandChaptersButton expandChaptersButton) {
+            FTBQuestsExpandChaptersButtonAccessor accessor = (FTBQuestsExpandChaptersButtonAccessor) expandChaptersButton;
+            FTBQuestsQuestScreenAccessor accessor2 = (FTBQuestsQuestScreenAccessor) accessor.getQuestScreen();
+            FTBQuestsChapterPanelWidgetAccessor accessor3 = (FTBQuestsChapterPanelWidgetAccessor) accessor2.getChapterPanel();
+            if (!accessor3.getExpanded() && !accessor3.callIsPinned()) {
+                points.add(new SnapPoint(widget.getX() + widget.width / 2, widget.getY() + widget.height / 2, Math.min(widget.width, widget.height) / 2));
             }
-            switch (subwidget.getClass().getSimpleName()) {
-//                case "QuestDescriptionField":
-//                case "BlankPanel":
-                case "CloseViewQuestButton":
-                case "PinViewQuestButton":
-                case "ViewQuestLinksButton":
-                    controlifyIntegrations$addWidgetSnapPoint(points, subwidget);
-                    return;
-//                case "QuestDescriptionField":
-//                    TextField questDescriptionField = (TextField) subwidget;
-                case "BlankPanel":
-                    BlankPanel blankPanel = (BlankPanel) subwidget;
-                    blankPanel.getWidgets().forEach(subsubwidget -> {
-                        ControlifyIntegrations.LOGGER.info("#### ViewQuest #### Adding snap point for " + subsubwidget.getClass().getSimpleName());
-                        controlifyIntegrations$addWidgetSnapPoint(points, subsubwidget);
-                    });
-//                default:
-//                    break;
+            return;
+        }
+
+        if (widget instanceof QuestButton) {
+            FTBLibraryWidgetAccessor accessor = (FTBLibraryWidgetAccessor) widget;
+            int x = (int) (widget.getX() - accessor.getParent().getScrollX()) + widget.width / 2;
+            int y = (int) (widget.getY() - accessor.getParent().getScrollY()) + widget.height / 2;
+            if (controlifyIntegrations$inBounds(x, y)) {
+                points.add(new SnapPoint(x, y, Math.min(widget.width, widget.height) / 2));
             }
-//              ControlifyIntegrations.LOGGER.info("#### ViewQuest #### Not adding snap point for " + subwidget.getClass().getSimpleName());
-//            controlifyIntegrations$addWidgetSnapPoint(points, subwidget);
-        });
+            return;
+        }
 
+        if (widget instanceof ChapterPanel.ModpackButton) {
+            int x = widget.getX() + widget.width - 8;
+            int y = widget.getY() + widget.height / 2;
+            if (controlifyIntegrations$inBounds(x, y)) {
+                points.add(new SnapPoint(x, y, 8));
+            }
+            return;
+        }
 
+        if (widget instanceof SimpleButton) {
+            if (widget.getTitle() instanceof MutableText text) {
+                if (text.getContent() instanceof TranslatableTextContent textContent) {
+                    if (Objects.equals(textContent.getKey(), "ftbquests.gui.no_dependants")
+                    || Objects.equals(textContent.getKey(), "ftbquests.gui.no_dependencies")) {
+                        return;
+                    }
+                }
+            }
+        }
 
-//        Adding snap points for quest screen
-//[15:54:37] [Render thread/INFO] [controlifyintegrations/]: Adding snap point for QuestDescriptionField
-//                [15:54:37] [Render thread/INFO] [controlifyintegrations/]: Adding snap point for BlankPanel
-//                [15:54:37] [Render thread/INFO] [controlifyintegrations/]: Adding snap point for CloseViewQuestButton
-//                [15:54:37] [Render thread/INFO] [controlifyintegrations/]: Adding snap point for PinViewQuestButton
-//                [15:54:37] [Render thread/INFO] [controlifyintegrations/]: Adding snap point for ViewQuestLinksButton
-//                [15:54:37] [Render thread/INFO] [controlifyintegrations/]: Adding snap point for SimpleButton
-//                [15:54:37] [Render thread/INFO] [controlifyintegrations/]: Adding snap point for SimpleButton
+        if (widget instanceof Button) {
+            int x = widget.getX() + widget.width / 2;
+            int y = widget.getY() + widget.height / 2;
+            if (controlifyIntegrations$inBounds(x, y)) {
+                points.add(new SnapPoint(x, y, Math.min(widget.width, widget.height) / 2));
+            }
+            return;
+        }
+
+        if (widget instanceof Panel panel) {
+            panel.getWidgets().forEach(subwidget -> {
+                controlifyIntegrations$panelRecursive(points, subwidget);
+            });
+            return;
+        }
     }
 }

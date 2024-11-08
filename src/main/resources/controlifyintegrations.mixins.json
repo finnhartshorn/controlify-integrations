@@ -11,8 +11,12 @@
 		"features.EmiRecipeTreeScreenCostAccessor",
 		"features.EmiRecipeTreeScreenMixin",
 		"features.EmiRecipeTreeScreenNodeAccessor",
+		"features.FTBLibraryBaseScreenAccessor",
 		"features.FTBLibrarySidebarGroupGuiButtonAccessor",
-		"features.FTBQuestsChapterPanelWidgetAccessor"
+		"features.FTBLibraryWidgetAccessor",
+		"features.FTBQuestsChapterPanelWidgetAccessor",
+		"features.FTBQuestsExpandChaptersButtonAccessor",
+		"features.FTBQuestsQuestScreenAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1
